@@ -1,112 +1,146 @@
-const cellElements = document.querySelectorAll("[data-cell]"); //Seleciona as celulas no html
-const board = document.querySelector("[data-board]"); //Seleciona a classe data-board para colocar o X ou bolinha na celula
-const winningMessageTextElement = document.querySelector(
-  "[data-winning-message-text]"
-);
-const winningMessage = document.querySelector("[data-winning-message]");
-const restartButton = document.querySelector("[data-restart-button]");
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-let isCircleTurn;
+body {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(#d3cfcf8a 0%, #aa45aa 100%);
+}
 
-const winningCombinations = [
-  /*variavel de combinações de vitoria*/ [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
+.board {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  grid-template-columns: repeat(3, auto);
+}
 
-const startGame = () => {
-  isCircleTurn = false;
+.board.x .cell:not(.x):not(.circle):hover::after,
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.circle .cell:not(.x):not(.circle):hover::after,
+.board.x .cell:not(.x):not(.circle):hover::before {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
 
-  for (const cell of cellElements) {
-    cell.classList.remove("circle");
-    cell.classList.remove("x");
-    cell.removeEventListener("click", handleClick);
-    cell.addEventListener("click", handleClick, { once: true });
-  }
+.cell {
+  width: 100px;
+  height: 100px;
+  border: 2px solid rgb(68, 3, 52);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
 
-  setBoardHoverClass();
-  winningMessage.classList.remove("show-winning-message");
-};
+.cell.x,
+.cell.circle {
+  cursor: not-allowed;
+}
 
-/*Exibe a mensagem do resultado*/
-const endGame = (isDraw) => {
-  if (isDraw) {
-    winningMessageTextElement.innerText = "Jogo empatou!";
-  } else {
-    winningMessageTextElement.innerText = isCircleTurn
-      ? "Jogador Bolinha Venceu!"
-      : "Jogador X Venceu!";
-  }
+/*Tira as bordas do quadrado*/
 
-  winningMessage.classList.add("show-winning-message");
-};
+.cell:nth-child(1),
+.cell:nth-child(2),
+.cell:nth-child(3) {
+  border-top: none;
+}
 
-const checkForWin = (currentPlayer) => {
-  return winningCombinations.some((combination) => {
-    return combination.every((index) => {
-      return cellElements[index].classList.contains(currentPlayer);
-    });
-  });
-};
+.cell:nth-child(1),
+.cell:nth-child(4),
+.cell:nth-child(7) {
+  border-left: none;
+}
 
-const checkForDraw = () => {
-  return [...cellElements].every((cell) => {
-    return cell.classList.contains("x") || cell.classList.contains("circle");
-  });
-};
+.cell:nth-child(7),
+.cell:nth-child(8),
+.cell:nth-child(9) {
+  border-bottom: none;
+}
 
-const placeMark = (cell, classToAdd) => {
-  cell.classList.add(classToAdd);
-};
+.cell:nth-child(3),
+.cell:nth-child(6),
+.cell:nth-child(9) {
+  border-right: none;
+}
 
-const setBoardHoverClass = () => {
-  board.classList.remove("circle");
-  board.classList.remove("x");
+/*Faz o simbolo do X*/
+.cell.x::before,
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::after,
+.board.x .cell:not(.x):not(.circle):hover::before {
+  content: "";
+  height: calc(100px * 0.15);
+  width: calc(100px * 0.9);
+  background: rgb(0, 0, 0);
+  position: absolute;
+}
 
-  if (isCircleTurn) {
-    //Verifica se é a vez do jogador bolinha ou X
-    board.classList.add("circle");
-  } else {
-    board.classList.add("x");
-  }
-};
+.cell.x::before,
+.board.x .cell:not(.x):not(.circle):hover::before {
+  transform: rotate(45deg);
+}
 
-const swapTurns = () => {
-  //Ilustra a imagem da bolinha ou do x na celula
-  isCircleTurn = !isCircleTurn;
+.cell.x::after,
+.board.x .cell:not(.x):not(.circle):hover::after {
+  transform: rotate(-45deg);
+}
 
-  setBoardHoverClass();
-};
+/*Faz o simbolo do circulo*/
+.cell.circle::before,
+.cell.circle::after,
+.board.circle .cell:not(.x):not(.circle):hover::after,
+.board.circle .cell:not(.x):not(.circle):hover::after {
+  content: "";
+  height: calc(100px * 0.9);
+  width: calc(100px * 0.9);
+  background: rgb(182, 25, 25);
+  position: absolute;
+  border-radius: 50%;
+}
 
-const handleClick = (e) => {
-  //Quando clica em uma celula muda para X ou Bolinha
-  // Colocar a marca (X ou Círculo)
-  const cell = e.target;
-  const classToAdd = isCircleTurn ? "circle" : "x";
+/*Faz a mensagem de quem ganhou*/
 
-  placeMark(cell, classToAdd);
+.winning-message {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  flex-direction: column;
+}
 
-  /* Verificar por vitória por meio da varial winningCOmbinations */
-  const isWin = checkForWin(classToAdd);
+.winning-message-button {
+  font-size: 2.5rem;
+  background-color: rgb(70, 66, 68);
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  margin-top: 16px;
+  color: white;
+}
 
-  /* Verificar por empate */
-  const isDraw = checkForDraw();
+.winning-message-button:hover {
+  color: rgb(0, 0, 0);
+  background-color: white;
+}
 
-  if (isWin) {
-    endGame(false);
-  } else if (isDraw) {
-    endGame(true);
-  } else {
-    /* Muda o simbolo com base no resultado */
-    swapTurns();
-  }
-};
+.winning-message-text {
+  color: white;
+  font-size: 5rem;
+}
 
-startGame();
-
-restartButton.addEventListener("click", startGame);
+.show-winning-message {
+  display: flex;
+}
