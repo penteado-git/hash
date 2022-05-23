@@ -1,5 +1,5 @@
-const cellElements = document.querySelectorAll("[data-cell]");
-const board = document.querySelector("[data-board]");
+const cellElements = document.querySelectorAll("[data-cell]"); //Seleciona as celulas no html
+const board = document.querySelector("[data-board]"); //Seleciona a classe data-board para colocar o X ou bolinha na celula
 const winningMessageTextElement = document.querySelector(
   "[data-winning-message-text]"
 );
@@ -9,7 +9,7 @@ const restartButton = document.querySelector("[data-restart-button]");
 let isCircleTurn;
 
 const winningCombinations = [
-  [0, 1, 2],
+  /*variavel de combinações de vitoria*/ [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
   [0, 3, 6],
@@ -33,12 +33,13 @@ const startGame = () => {
   winningMessage.classList.remove("show-winning-message");
 };
 
+/*Exibe a mensagem do resultado*/
 const endGame = (isDraw) => {
   if (isDraw) {
     winningMessageTextElement.innerText = "Jogo empatou!";
   } else {
     winningMessageTextElement.innerText = isCircleTurn
-      ? "Jogador O Venceu!"
+      ? "Jogador Bolinha Venceu!"
       : "Jogador X Venceu!";
   }
 
@@ -68,6 +69,7 @@ const setBoardHoverClass = () => {
   board.classList.remove("x");
 
   if (isCircleTurn) {
+    //Verifica se é a vez do jogador bolinha ou X
     board.classList.add("circle");
   } else {
     board.classList.add("x");
@@ -75,22 +77,24 @@ const setBoardHoverClass = () => {
 };
 
 const swapTurns = () => {
+  //Ilustra a imagem da bolinha ou do x na celula
   isCircleTurn = !isCircleTurn;
 
   setBoardHoverClass();
 };
 
 const handleClick = (e) => {
+  //Quando clica em uma celula muda para X ou Bolinha
   // Colocar a marca (X ou Círculo)
   const cell = e.target;
   const classToAdd = isCircleTurn ? "circle" : "x";
 
   placeMark(cell, classToAdd);
 
-  // Verificar por vitória
+  /* Verificar por vitória por meio da varial winningCOmbinations */
   const isWin = checkForWin(classToAdd);
 
-  // Verificar por empate
+  /* Verificar por empate */
   const isDraw = checkForDraw();
 
   if (isWin) {
@@ -98,7 +102,7 @@ const handleClick = (e) => {
   } else if (isDraw) {
     endGame(true);
   } else {
-    // Mudar símbolo
+    /* Muda o simbolo com base no resultado */
     swapTurns();
   }
 };
