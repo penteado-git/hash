@@ -9,7 +9,8 @@ const restartButton = document.querySelector("[data-restart-button]");
 let isCircleTurn;
 
 const winningCombinations = [
-  /*variavel de combinações de vitoria*/ [0, 1, 2],
+  /*variavel de combinações de vitoria*/
+  [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
   [0, 3, 6],
